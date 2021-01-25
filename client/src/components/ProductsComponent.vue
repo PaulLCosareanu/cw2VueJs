@@ -54,22 +54,24 @@
     </div>
     <div v-if="showCheckout">
       <div class="productList">
-        
-          <div v-for="element in checkoutItems" :key="element.id" class="productBought">
-              <div class="productTop">
-                <img class="image" v-bind:src="element.img" />
-                <div class="productText">
-                  <h3>{{element.subject}}</h3>
-                  <p>{{element.location}}</p>
-                  <p>price:{{ element.price }}</p>
-                  <p>Quantity: {{ element.quantity }}</p>
-                </div>
-              </div>
-              <button v-on:click="deleteItem(prod.id)" class="button">
-                Cancel item
-              </button>
+        <div
+          v-for="element in checkoutItems"
+          :key="element.id"
+          class="productBought"
+        >
+          <div class="productTop">
+            <img class="image" v-bind:src="element.img" />
+            <div class="productText">
+              <h3>{{ element.subject }}</h3>
+              <p>{{ element.location }}</p>
+              <p>price:{{ element.price }}</p>
+              <p>Quantity: {{ element.quantity }}</p>
+            </div>
           </div>
-         
+          <button v-on:click="deleteItem(element.id)" class="button">
+            Cancel item
+          </button>
+        </div>
       </div>
       <button type="button" v-on:click="displayProducts()">Go back</button>
       <h3>Please specify your name:</h3>
@@ -124,10 +126,13 @@ export default {
       showProducts: true,
       showCheckoutButton: false,
       showCheckout: false,
-      showSuccess:false,
-      showError:false,
-      showSubmitButton:false,
-      
+      showSuccess: false,
+      showError: false,
+      showSubmitButton: false,
+      name: "",
+      number: "",
+      isLet: false,
+      isNum: false,
     };
   },
   mounted() {
@@ -139,10 +144,10 @@ export default {
   //   this.checkUpdateStock();
   // },
   methods: {
-        checkForm() {
+    checkForm() {
       if (this.isLet && this.isNum && this.number != "" && this.name != "") {
         this.showSubmitButton = true;
-        console.log(this.number)
+        console.log(this.number);
         this.showError = false;
       } else {
         this.showSubmitButton = false;
@@ -150,32 +155,28 @@ export default {
       }
     },
     isLetter() {
-
-      let nm = this.name
-      console.log("step 1")
+      let nm = this.name;
+      console.log("step 1");
       if (/^[A-Za-z]+$/.test(nm)) {
-        this.isLet = true
-        console.log("step 2")
+        this.isLet = true;
+        console.log("step 2");
         // this.showError=false;
       } else {
         this.isLet = false;
         // this.showError=true;
       }
-
     },
     isNumber() {
-
-      let num = this.number
-      console.log("here 1")
+      let num = this.number;
+      console.log("here 1");
       if (/^\d+$/.test(num)) {
-        this.isNum = true
-        console.log("here 2")
+        this.isNum = true;
+        console.log("here 2");
         this.showError = false;
       } else {
         this.isNum = false;
         this.showError = true;
       }
-
     },
     getAllLessons() {
       fetch("http://localhost:8080/api/products")
@@ -209,10 +210,10 @@ export default {
         if (element._id == id && element.quantity != 0) {
           this.object = {
             id: element._id,
-            subject:element.subject,
-            location:element.location,
-            price:element.price,
-            img:element.img_link,
+            subject: element.subject,
+            location: element.location,
+            price: element.price,
+            img: element.img_link,
             quantity: 1,
           };
           this.checkoutItems.forEach((el) => {
@@ -255,6 +256,23 @@ export default {
       this.order = event.target.value;
       this.sortBy();
     },
+    deleteItem(id){
+      for(let i=0;i<this.checkoutItems.length;i++){
+        if(this.checkoutItems[i].id==id){
+          this.checkoutItems[i].quantity--;
+          this.lessons.forEach(element => {
+            if(element._id==id){
+              element.quantity++;
+            }
+          });
+          if(this.checkoutItems[i].quantity==0){
+            this.checkoutItems.splice(i,1)
+          }
+          
+        }
+      }
+      localStorage.product=JSON.stringify(this.checkoutItems)
+    },
     sortBy() {
       console.log(3);
       if (this.order == "asc") {
@@ -270,7 +288,7 @@ export default {
         );
       }
     },
-    
+
     // getUser() {
     //   fetch("http://localhost:5000/api/user")
     //     .then((response) => response.json())

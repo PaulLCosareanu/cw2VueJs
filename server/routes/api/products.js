@@ -11,6 +11,11 @@ router.get("/",async(req,res)=>{
     res.send(await products.find({}).toArray());
 })
 
+
+router.get("/order",async(req,res)=>{
+    const products=await loadOrdersCollection();
+    res.send(await products.find({}).toArray());
+})
 //add products//////////////////////////////////////////////////////////////
 
 router.post("/", async(req,res)=>{
@@ -25,6 +30,19 @@ router.post("/", async(req,res)=>{
     res.status(201).send();
 })
 
+
+
+router.post("/order", async(req,res)=>{
+    const products=await loadOrdersCollection();
+    await products.insertOne({
+        id: req.body.id,
+        quantity:req.body.quantity,
+        price:req.body.price
+    });
+    res.status(201).send();
+})
+
+
 //delete products///////////////////////////////////////////////
 
 router.delete("/:id", async(req,res)=>{
@@ -35,18 +53,22 @@ router.delete("/:id", async(req,res)=>{
 
 
 //update products*************************************************
-
+router.put("/:id&&:object", async(req,res)=>{
+    const products=await loadProductsCollection();
+    await products.updateOne(req.params.id,req.params.object)
+    res.status(200).send();
+})
 
 
 async function loadProductsCollection(){
     const client=await mongodb.MongoClient.connect("mongodb+srv://UserMongo:1234%40Middlesex@products.ysvpf.mongodb.net/vue?retryWrites=true&w=majority", { useNewUrlParser: true })
 
     return client.db("vue").collection("products")
+}
+async function loadOrdersCollection(){
+    const client=await mongodb.MongoClient.connect("mongodb+srv://UserMongo:1234%40Middlesex@products.ysvpf.mongodb.net/vue?retryWrites=true&w=majority", { useNewUrlParser: true })
 
-
-
-
-
+    return client.db("vue").collection("orders")
 }
 
 module.exports = router;
