@@ -48,6 +48,7 @@
           class="checkoutButton"
           v-on:click="displayCheckout()"
         >
+        
           Checkout
         </button>
       </div>

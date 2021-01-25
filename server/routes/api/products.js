@@ -39,6 +39,7 @@ router.post("/order", async(req,res)=>{
         quantity:req.body.quantity,
         price:req.body.price
     });
+    
     res.status(201).send();
 })
 
