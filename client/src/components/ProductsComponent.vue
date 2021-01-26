@@ -48,7 +48,6 @@
           class="checkoutButton"
           v-on:click="displayCheckout()"
         >
-        
           Checkout
         </button>
       </div>
@@ -145,6 +144,58 @@ export default {
   //   this.checkUpdateStock();
   // },
   methods: {
+    checkout(){
+      let bodyUpdate={}
+      this.checkoutItems.forEach(element => {
+        const body={
+          id:element.id,
+          quantity:element.quantity,
+          price:element.price,
+          user:this.name,
+          number:this.number
+        }
+        this.lessons.forEach(el => {
+          if(el._id==element.id){
+            bodyUpdate={
+            id:element.id,
+            $set:{quantity:el.quantity}
+        }
+          }
+        });
+        
+        fetch("http://localhost:8080/api/products/order",{
+          method:"post",
+          body:JSON.stringify(body),
+          headers:{"Content-Type":"application/json"}
+  
+        })
+          .then((response) => {if(response.status==200){
+            this.showSuccess=true;
+            localStorage.clear();
+            this.checkoutItems=[];
+            
+
+          }})
+             try {
+               
+               fetch("http://localhost:8080/api/products/order",{
+              method:"put",
+              body:JSON.stringify(bodyUpdate),
+              headers:{"Content-Type":"application/json"}
+            })
+              console.log("success")
+             } catch (error) {
+               console.log(error)
+             }
+          // .then((response)=>{if(response.status==200){
+          //   this.showSuccess=true;
+          // }})
+          // .then((data) => {
+            // console.log(data)
+          // });
+        
+      });
+    },
     checkForm() {
       if (this.isLet && this.isNum && this.number != "" && this.name != "") {
         this.showSubmitButton = true;
@@ -257,22 +308,21 @@ export default {
       this.order = event.target.value;
       this.sortBy();
     },
-    deleteItem(id){
-      for(let i=0;i<this.checkoutItems.length;i++){
-        if(this.checkoutItems[i].id==id){
+    deleteItem(id) {
+      for (let i = 0; i < this.checkoutItems.length; i++) {
+        if (this.checkoutItems[i].id == id) {
           this.checkoutItems[i].quantity--;
-          this.lessons.forEach(element => {
-            if(element._id==id){
+          this.lessons.forEach((element) => {
+            if (element._id == id) {
               element.quantity++;
             }
           });
-          if(this.checkoutItems[i].quantity==0){
-            this.checkoutItems.splice(i,1)
+          if (this.checkoutItems[i].quantity == 0) {
+            this.checkoutItems.splice(i, 1);
           }
-          
         }
       }
-      localStorage.product=JSON.stringify(this.checkoutItems)
+      localStorage.product = JSON.stringify(this.checkoutItems);
     },
     sortBy() {
       console.log(3);

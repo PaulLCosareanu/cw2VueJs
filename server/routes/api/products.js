@@ -4,6 +4,7 @@ const mongodb  = require("mongodb")
 
 const router= express.Router();
 
+
 //get products////////////////////////////////////////////////////
 
 router.get("/",async(req,res)=>{
@@ -37,10 +38,12 @@ router.post("/order", async(req,res)=>{
     await products.insertOne({
         id: req.body.id,
         quantity:req.body.quantity,
-        price:req.body.price
+        price:req.body.price,
+        user:req.body.user,
+        number:req.body.number
     });
     
-    res.status(201).send();
+    res.status(200).send();
 })
 
 
@@ -54,9 +57,10 @@ router.delete("/:id", async(req,res)=>{
 
 
 //update products*************************************************
-router.put("/:id&&:object", async(req,res)=>{
+router.put("/order", async(req,res)=>{
     const products=await loadProductsCollection();
-    await products.updateOne(req.params.id,req.params.object)
+    console.log(new mongodb.ObjectID)
+    await products.updateOne({_id:new mongodb.ObjectID(req.body.id)},{$set:req.body.$set},{upsert:true})
     res.status(200).send();
 })
 
