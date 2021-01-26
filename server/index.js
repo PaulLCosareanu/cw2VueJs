@@ -28,6 +28,12 @@ let demoLogger = (req, res, next) => {
     next();
   };
   
+  let imageLogger=(req,res,next)=>{
+
+
+
+  };
+
   app.use(demoLogger);
 
 app.use(bodyParser.json());
